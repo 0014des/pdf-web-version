@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歴史一問一答マスター | 7-9章学習アプリ</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">
+                <i class="fa-solid fa-graduation-cap logo-icon"></i>
+                <div class="logo-text">
+                    <h1>歴史一問一答<span>マスター</span></h1>
+                    <p>第7章・第8章・第9章 世界史学習システム</p>
+                </div>
+            </div>
+            <button id="theme-toggle" class="icon-btn" title="テーマ切り替え" aria-label="テーマ切り替え">
+                <i class="fa-solid fa-sun"></i>
+            </button>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="app-main">
+            <!-- Sidebar / Settings Panel -->
+            <section class="settings-panel glass-panel">
+                <h2 class="panel-title"><i class="fa-solid fa-sliders"></i> 学習設定</h2>
+                
+                <!-- Chapter Select -->
+                <div class="setting-group">
+                    <label class="setting-label">学習する章（複数選択可）</label>
+                    <div class="chapter-chips">
+                        <button class="chip active" data-chapter="7">
+                            <span class="chip-num">Ch.7</span>
+                            <span class="chip-title">中世ヨーロッパ</span>
+                        </button>
+                        <button class="chip active" data-chapter="8">
+                            <span class="chip-num">Ch.8</span>
+                            <span class="chip-title">東アジアとモンゴル</span>
+                        </button>
+                        <button class="chip active" data-chapter="9">
+                            <span class="chip-num">Ch.9</span>
+                            <span class="chip-title">大交易・大交流の時代</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mode Select -->
+                <div class="setting-group">
+                    <label class="setting-label">学習モード</label>
+                    <div class="mode-select">
+                        <button class="mode-btn active" data-mode="card">
+                            <i class="fa-solid fa-clone"></i>
+                            <div class="mode-desc">
+                                <strong>カードめくり</strong>
+                                <span>暗記・自己判定</span>
+                            </div>
+                        </button>
+                        <button class="mode-btn" data-mode="choice">
+                            <i class="fa-solid fa-list-ul"></i>
+                            <div class="mode-desc">
+                                <strong>４択クイズ</strong>
+                                <span>選択肢から回答</span>
+                            </div>
+                        </button>
+                        <button class="mode-btn" data-mode="typing">
+                            <i class="fa-solid fa-keyboard"></i>
+                            <div class="mode-desc">
+                                <strong>文字入力</strong>
+                                <span>スペル・記述練習</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Order Select -->
+                <div class="setting-group">
+                    <label class="setting-label">出題順</label>
+                    <div class="segmented-control">
+                        <input type="radio" id="order-random" name="order" value="random" checked>
+                        <label for="order-random"><i class="fa-solid fa-shuffle"></i> ランダム</label>
+                        
+                        <input type="radio" id="order-sequence" name="order" value="sequence">
+                        <label for="order-sequence"><i class="fa-solid fa-arrow-down-1-9"></i> 番号順</label>
+                    </div>
+                </div>
+
+                <!-- Filter Mode -->
+                <div class="setting-group">
+                    <label class="setting-label">出題対象の絞り込み</label>
+                    <div class="segmented-control three-tabs">
+                        <input type="radio" id="filter-all" name="filter" value="all" checked>
+                        <label for="filter-all">すべて</label>
+                        
+                        <input type="radio" id="filter-wrong" name="filter" value="wrong">
+                        <label for="filter-wrong">苦手のみ</label>
+                        
+                        <input type="radio" id="filter-bookmark" name="filter" value="bookmark">
+                        <label for="filter-bookmark"><i class="fa-solid fa-star"></i> ブックマーク</label>
+                    </div>
+                </div>
+
+                <button id="start-btn" class="primary-btn">
+                    <i class="fa-solid fa-play"></i> 学習を開始する
+                </button>
+                <button id="view-list-btn" class="secondary-btn" style="width: 100%; margin-top: 12px; display: flex; justify-content: center; gap: 8px;">
+                    <i class="fa-solid fa-list-check"></i> 問題一覧を見る
+                </button>
+            </section>
+
+            <!-- Learning Area -->
+            <section class="learning-area">
+                <!-- Stats Dashboard (Hidden until start) -->
+                <div class="stats-bar glass-panel" style="display: none;">
+                    <div class="stat-item">
+                        <span class="stat-label">進行状況</span>
+                        <span class="stat-value" id="progress-text">0 / 0</span>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progress-bar" style="width: 0%;"></div>
+                    </div>
+                    <div class="stat-item text-right">
+                        <span class="stat-label">正答率</span>
+                        <span class="stat-value highlight" id="accuracy-text">0%</span>
+                    </div>
+                </div>
+
+                <!-- Question Card -->
+                <div class="question-card-container" id="study-panel" style="display: none;">
+                    <div class="card-meta">
+                        <span class="card-chapter-tag" id="card-chapter-tag">Chapter 7</span>
+                        <div class="card-actions">
+                            <button id="bookmark-btn" class="action-icon-btn" title="ブックマークに追加" aria-label="ブックマーク">
+                                <i class="fa-regular fa-star"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Flip Card Mechanism -->
+                    <div class="flashcard" id="flashcard">
+                        <!-- Front (Question) -->
+                        <div class="card-face card-front">
+                            <div class="card-content">
+                                <div class="q-badge">QUESTION</div>
+                                <p class="question-text" id="question-display">ここに問題文が表示されます。</p>
+                            </div>
+                            
+                            <!-- 4-choice Options Container (Mode: choice) -->
+                            <div class="options-container" id="options-container" style="display: none;">
+                                <!-- Dynamically generated buttons -->
+                            </div>
+
+                            <!-- Typing Input Container (Mode: typing) -->
+                            <div class="typing-container" id="typing-container" style="display: none;">
+                                <input type="text" id="typing-input" placeholder="答えを入力してください..." autocomplete="off">
+                                <button id="submit-typing-btn" class="typing-submit-btn">判定する</button>
+                            </div>
+
+                            <!-- Card flip hint -->
+                            <div class="card-hint" id="card-hint">
+                                <i class="fa-solid fa-arrow-rotate-left"></i> タップまたはスペースキーで答えを表示
+                            </div>
+                        </div>
+
+                        <!-- Back (Answer) -->
+                        <div class="card-face card-back">
+                            <div class="card-content">
+                                <div class="a-badge">CORRECT ANSWER</div>
+                                <h3 class="answer-text" id="answer-display">ここに答えが表示されます。</h3>
+                                <div class="answer-explanation" id="answer-explanation"></div>
+                            </div>
+                            
+                            <!-- User self-evaluation (Mode: card) -->
+                            <div class="card-feedback" id="self-eval-container">
+                                <button class="feedback-btn wrong" id="eval-wrong">
+                                    <i class="fa-solid fa-xmark"></i> まだ覚えてない
+                                </button>
+                                <button class="feedback-btn correct" id="eval-correct">
+                                    <i class="fa-solid fa-check"></i> 覚えた！
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Post-Answer Controls (Choice / Typing Mode) -->
+                    <div class="feedback-controls" id="next-container" style="display: none;">
+                        <div id="feedback-message" class="feedback-msg"></div>
+                        <button id="next-btn" class="primary-btn">
+                            次へ進む <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Result Panel -->
+                <div class="result-panel glass-panel" id="result-panel" style="display: none;">
+                    <div class="result-header">
+                        <div class="trophy-icon"><i class="fa-solid fa-trophy"></i></div>
+                        <h2>学習お疲れ様でした！</h2>
+                        <p>今回の学習結果は以下の通りです。</p>
+                    </div>
+
+                    <div class="result-stats">
+                        <div class="res-stat-card">
+                            <span class="num" id="res-total">0</span>
+                            <span class="lbl">総出題数</span>
+                        </div>
+                        <div class="res-stat-card success">
+                            <span class="num" id="res-correct">0</span>
+                            <span class="lbl">正解数</span>
+                        </div>
+                        <div class="res-stat-card accuracy">
+                            <span class="num" id="res-accuracy">0%</span>
+                            <span class="lbl">正答率</span>
+                        </div>
+                    </div>
+
+                    <div class="result-review-section">
+                        <h3><i class="fa-solid fa-circle-question"></i> 今回間違えた問題</h3>
+                        <div class="review-list" id="review-list">
+                            <!-- Dynamically generated list -->
+                        </div>
+                    </div>
+
+                    <div class="result-actions">
+                        <button id="retry-all-btn" class="secondary-btn">
+                            <i class="fa-solid fa-rotate-right"></i> もう一度最初から
+                        </button>
+                        <button id="retry-wrong-btn" class="primary-btn">
+                            <i class="fa-solid fa-triangle-exclamation"></i> 間違えた問題のみ再挑戦
+                        </button>
+                        <button id="back-to-settings-btn" class="secondary-btn">
+                            <i class="fa-solid fa-house"></i> 設定に戻る
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Empty State/Placeholder -->
+                <div class="empty-state glass-panel" id="placeholder-panel">
+                    <div class="empty-icon"><i class="fa-solid fa-book-open"></i></div>
+                    <h3>学習を始めましょう</h3>
+                    <p>左側のパネルで章と学習モードを選択し、<br>「学習を開始する」ボタンを押してください。</p>
+                </div>
+
+                <!-- List Panel -->
+                <div class="result-panel glass-panel" id="list-panel" style="display: none; padding: 32px; flex-direction: column; gap: 24px;">
+                    <div class="result-header" style="text-align: left; align-items: flex-start; border-bottom: 1px solid var(--panel-border); padding-bottom: 16px; width: 100%;">
+                        <h2 style="display: flex; align-items: center; gap: 10px;"><i class="fa-solid fa-list-ul" style="background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i> 問題一覧</h2>
+                        <p style="color: var(--text-secondary); margin-top: 4px;">登録されている問題の一覧です。答えの部分をクリックすると答えを表示できます。</p>
+                        
+                        <div class="list-controls" style="display: flex; gap: 16px; width: 100%; margin-top: 16px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+                            <div class="segmented-control" id="list-chapter-tabs" style="max-width: 320px;">
+                                <input type="radio" id="list-tab-all" name="list-tab" value="all" checked>
+                                <label for="list-tab-all">すべて</label>
+                                <input type="radio" id="list-tab-7" name="list-tab" value="7">
+                                <label for="list-tab-7">Ch.7</label>
+                                <input type="radio" id="list-tab-8" name="list-tab" value="8">
+                                <label for="list-tab-8">Ch.8</label>
+                                <input type="radio" id="list-tab-9" name="list-tab" value="9">
+                                <label for="list-tab-9">Ch.9</label>
+                            </div>
+                            <button id="toggle-all-answers-btn" class="secondary-btn" style="padding: 8px 16px; font-size: 0.85rem; border-radius: 12px;">
+                                <i class="fa-solid fa-eye"></i> すべての答えを表示
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="question-list-container" id="question-list-container" style="display: flex; flex-direction: column; gap: 16px; max-height: 500px; overflow-y: auto; padding-right: 8px;">
+                        <!-- Dynamically populated list -->
+                    </div>
+
+                    <div class="result-actions" style="border-top: 1px solid var(--panel-border); padding-top: 20px;">
+                        <button id="list-back-btn" class="secondary-btn">
+                            <i class="fa-solid fa-house"></i> 設定に戻る
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>&copy; 2026 歴史一問一答マスター. All Rights Reserved. Created for excellent student.</p>
+        </footer>
+    </div>
+
+    <!-- Data & Scripts -->
+    <script src="questions.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
